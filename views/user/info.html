@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>INFO PAGE</h2>
+    <table>
+        <tr>
+            <td>IDX</td>
+            <td>ID</td>
+            <td>PASSWORD</td>
+            <td>NAME</td>
+            <td>GENDER</td>
+            <td>IMAGE</td>
+            <td>DATE</td>
+        </tr>
+        {% for item in list %}
+        <tr>
+            <td>{{item.id}}</td>
+            <td>{{item.userid}}</td>
+            <td>{{item.userpw}}</td>
+            <td>{{item.username}}</td>
+            <td>{{'FEMALE' if item.gender else 'MALE'}}</td>
+            <td>{{item.userimage}}</td>
+            <td>{{item.userdt}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
