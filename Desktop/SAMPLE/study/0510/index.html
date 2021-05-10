@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+</head>
+
+<body>
+    <button id="btn">데이터 가져오기</button>
+
+    <table id="list">
+        <td>아이디</td>
+        <td>패스워드</td>
+        <td>이름</td>
+    </table>
+
+    <script type="text/javascript">
+        const table = document.querySelector('#list');
+        let index = 0;
+        function getData() {
+            axios.get('http://localhost:3000/user/info')        //Promise 객체로 반환이 되어서 .으로 사용가능
+            .then((res) => {
+                let list = res.data.userList[index];
+                // list.forEach(ele=>{
+                //     console.log(ele);
+                const tr = document.createElement('tr');
+                const idTd = document.createElement('td');
+                const pwTd = document.createElement('td');
+                const nameTd = document.createElement('td');
+
+                idTd.innerHTML = list.userid;
+                pwTd.innerHTML = list.userpw;
+                nameTd.innerHTML = list.username;
+
+                tr.appendChild(idTd);
+                tr.appendChild(pwTd);
+                tr.appendChild(nameTd);
+
+                table.appendChild(tr);
+                // })
+                index++;
+            });
+        };
+
+        const btn = document.querySelector('#btn');
+        btn.addEventListener('click', getData);
+    </script>
+</body>
+
+</html>
