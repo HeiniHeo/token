@@ -1,0 +1,41 @@
+<form action="/login" method="post">
+    <input type="text" name="userid">
+    <input type="password" name="userpw">
+    <input type="submit" value="LOGIN">
+</form>
+
+<button id="req">요청테스트</button>
+<span class="root"></span>
+
+<script type="text/javascript">
+    const btn = document.querySelector('#req');
+    btn.addEventListener('click',()=>{
+        console.log('req clicked');
+        /*
+        fetch
+
+        첫번째 인자값 == url
+        두번째 인자값 == options => 객체
+
+        결과값이 promise 객체로 나옴
+        */
+        fetch('http://localhost:3000/login2',{
+            method:'POST',
+            headers:{
+                'Content-type':'application/x-www-form-urlencoded'
+            },
+            body:JSON.stringify({
+                a:1,b:2
+            })
+        })
+        .then(data=>{
+            console.log(data); // after 요청 완료 => 처리결과를 객체로 반환
+            return data.json();
+        })
+        .then(json=>{
+            console.log(json);
+            const root = document.querySelector('.root');
+            root.innerHTML = json.test;
+        })
+    })
+</script>
