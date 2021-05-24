@@ -1,0 +1,153 @@
+//passport는 책에 잘 나와있음
+여기서는 내 서버와 카카오 서버를 연결하는 방법을 알아보겠다
+
+필요한것
+세션,쿠키
+카카오 결과치를 받아서 담는공간 - 세션
+
+
+1. oAuth
+하나의 개념임
+http 기반 보안 프로토콜이다.
+무언가 key를 가지고 서로 왔다갔다 하는 개념
+
+Autherication 인증 - 내 서버
+Authoization 허가 - 카카오 서버
+- 단어의 뜻만 알고 있으면 된다.
+
+어떤 key를 인증하고 허가해준다.
+
+API key
+
+
+2. 카카오 개발자 콘솔 검색
+https://developers.kakao.com/
+
+
+REST API 키 : 	50bbb5205dc8fcc9c2611542015a54d5
+
+Redirect URI : http://localhost:8000/auth/kakao/callback
+
+secret 코드 : 	S8oRhiZCvxEOQWCmq0AMBM71g5rxZsw8
+
+이 secret 코드를 보내서 로그인할 때 인증을 받는다.
+
+
+3. 원래는 router로 설정해서 빼줘야 하는데 이해를 위해 이렇게 함
+
+4. 로그인에 입력하는 폼이 다 카카오쪽이다.
+우리는 아이디와 pw를 받을 수 없음
+
+
+`https://kauth.kakao.com/oauth/authorize?client_id=${kakao.clientID}&redirect_uri=${kakao.redirectUri}&response_type=code`
+
+
+5. 동의하기 누르면 오류가 왜 날까? 
+- localhost 8000으로 보냈기때문에 (우리는 3000을쓰고있음)
+카카오로 로그인하기 누르면 카카오페이지로 가고
+동의하기 누르면 내 페이지로 오게 되어있음
+
+그래서
+1) redirectUri : "http://localhost:3000/auth/kakao/callback"
+3000 으로 변경해준다.
+
+2) 카카오 developers 페이지에서 
+redirect_uri 값을 또 3000으로 변경해준다
+
+-> 하나라도 정보가 다르면 값을 제대로 반환해주지 않는다.
+
+
+6. axios 
+
+app.get('/auth/kakao/callback',(req,res)=>{
+   이쪽에 씀
+    res.send('success');
+})
+
+//axios : 요청을 보내는 라이브러리 npm install axios
+return값은 Promise Object 객체이다.
+async await 를 쓰던지
+
+7. qs
+npm install qs
+객체를 글자로 바꿔줌
+
+// npm install qs 하고 여기서 qs를 씀
+data:qs.stringify({
+    grant_type : 'authroization_code',     // 특정 string
+    client_id : kakao.clientID,
+    client_secret : kakao.clientSecret,
+    redirectUri : kakao.redirectUri,
+    code : req.query.code,  //get값으로 줬던 code - query
+})// 객체를 String으로 변환
+
+query 로 code 를 줌 (그림 8)
+이 code를 가지고 kakao에게 요청 
+kakao 무언가를 return 해줌
+
+
+8.
+크롬 쿠키 지우고
+카톡 설정에서 연결 끊고 다시 서버 연결하면 9번 그림이 나오게 된다.
+
+
+
+9. 동의항목 그림 10
+어느정도까지 정보를 받아올건가
+
+// profile account_email 를 쿼리스트링으로 받아온다
+app.get('/auth/kakao',(req,res)=>{
+    const kakaoAuthURL = `https://kauth.kakao.com/oauth/authorize?client_id=${kakao.clientID}&redirect_uri=${kakao.redirectUri}&response_type=code&scope=profile,account_email`;
+    res.redirect(kakaoAuthURL);
+})
+
+
+code(내가 보냄)를 주고 access_token(카카오가 보냄)을 받아온다
+
+kakao db에 우리가 입력한 user의 정보가 저장된다.
+
+이런 값들을 받아오기 위해서 kakao 에서 연결 끊고 쿠키 지우고 다시 해야함
+맨처음에 정보 받아오기에 대한 것을 안해줬기 때문에 첨부터 다시 해준거임
+
+user 내용을 받아와서 나의 세션에 담고
+로그인을 하는걸 해야한다
+
+-------------
+월요일에는
+이걸 내 db에 저장하고 하는걸 해보겠다
+
+---------
+node js 책에서 passport 따라하는 부분 있음! 이거 해보기
+
+
+
+--------------------
+이 정보들을 
+세션 스토리지에 저장하는걸 해야한다
+
+user 안에 data 부분만 우리가 필요한 부분이다.
+
+세션에 로그인값 저장하기
+npm install express-session 하고 설정해주고
+
+서버 켜고
+카카오로그인
+서버 킨 상태에서 다시 localhost:3000 으로 들어가서 확인
+-------------------
+
+정보 받아오기
+세션 설정후
+로그인 - 회원정보 누르면 그림16 이 나온다
+app.get('/auth/info',(req,res)=>{
+    let {nickname,profile_image} = req.session.kakao.properties
+    res.render('./info.html',{
+        nickname,
+        profile_image
+    })
+})
+
+
+-------------------------------
+5/24 월
+연결끊기
+로컬이랑 카카오로그인 사용하는 방법
