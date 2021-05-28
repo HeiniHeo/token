@@ -1,0 +1,81 @@
+<h1>GET REQUEST</h1>
+<form action="/login" method="get">
+    <input type="text" name="userid">
+    <input type="password" name="userpw">
+    <input type="submit" value="GET"> 
+    <!--
+        first
+    http://localhost:3000 -> http://localhost:3000/login
+    어떤 정보를 가지고 login으로 이동 하는가?
+    -->
+</form>
+
+<h1>POST REQUEST</h1>
+<form action="/login" method="post">
+    <input type="text" name="userid">
+    <input type="password" name="userpw">
+    <input type="submit" value="POST">
+</form>
+
+<h1>비동기 활용하기 GET</h1>
+<button id="btn">통신하기</button>
+<div id="getroot"></div>
+<div id="loding" style="display: none;">
+    <img src="https://i.pinimg.com/originals/6a/e4/e1/6ae4e194ffef725f03e730562b546fef.png">
+</div>
+<script type="text/javascript">
+const btn = document.querySelector('#btn');
+btn.addEventListener('click',btnFn);
+function btnFn(){
+    console.log(('req click'));
+    document.querySelector('#loding').style.display = 'block';
+    let options = {
+        method:'GET',
+    }
+    fetch('http://localhost:3001/login?userid=asdf&userpw=asdf',options)
+    .then(data=>{
+        return data.text();
+    })
+    .then(text=>{
+        document.querySelector('#loding').style.display = 'none';
+        const root = document.querySelector('#getroot');
+        root.innerHTML += text+'<br/>'
+    })
+}
+</script>
+
+<h1>비동기 활용하기 POST</h1>
+<button id="btn2">통신하기</button>
+<div id="loding" style="display: none;">
+    <img src="https://i.pinimg.com/originals/6a/e4/e1/6ae4e194ffef725f03e730562b546fef.png">
+</div>
+<div id="postroot"></div>
+<script type="text/javascript">
+const btn2 = document.querySelector('#btn2');
+btn2.addEventListener('click',btnFn2);
+function btnFn2(){
+    console.log(('req click'));
+    document.querySelector('#loding').style.display = 'block';
+    let options = {
+        method:'POST',
+        headers:{
+            'content-type' : 'application/json'
+        },
+        body:JSON.stringify({userid:'asdfasdf',userpw:'asdfasdf'})
+    }
+    fetch('http://localhost:3001/login?userid=asdf&userpw=asdf',options)
+    .then(data=>{
+        if(data.status == 404){
+            const root = document.querySelector('#postroot');
+            root.innerHTML = '페이지가 존재하지 않습니다.'
+            return
+        }
+        return data.text();
+    })
+    .then(text=>{
+        document.querySelector('#loding').style.display = 'none';
+        const root = document.querySelector('#postroot');
+        root.innerHTML += text+'<br/>'
+    })
+}
+</script>
